@@ -46,62 +46,66 @@
             <h2>Mis Citas</h2>
             <button @click="openCreateAppointmentModal">Crear Nueva Cita</button>
             <div v-if="appointments.length">
-                <ul>
-                    <li v-for="appointment in appointments" :key="appointment._id">
-                        <p><strong>Fecha:</strong> {{ appointment.date }}</p>
-                        <p><strong>Centro:</strong> {{ appointment.center }}</p>
-                        <p><strong>Estado:</strong> {{ appointment.status }}</p>
-                        <button @click="openEditAppointmentModal(appointment)">Modificar</button>
-                        <button @click="cancelAppointment(appointment._id)">Cancelar</button>
-                    </li>
-                </ul>
-            </div>
-            <div v-else>
+            <ul>
+                <li v-for="appointment in appointments" :key="appointment._id">
+                    <p><strong>Fecha:</strong> {{ appointment.date }}</p>
+                    <p><strong>Centro:</strong> {{ appointment.center }}</p>
+                    <p><strong>Estado:</strong> {{ appointment.status }}</p>
+                    <button @click="openEditAppointmentModal(appointment)">Modificar</button>
+                    <button @click="cancelAppointment(appointment._id)">Cancelar</button>
+                </li>
+            </ul>
+        </div>
+        <div v-else>
                 <p>No tiene ninguna cita pedida.</p>
             </div>
-        </div>
+    </div>
 
-        <!-- Modal para crear una nueva cita -->
-        <div v-if="isCreatingAppointment" class="modal">
-            <h3>Crear Nueva Cita</h3>
-            <form @submit.prevent="createAppointment">
-                <div class="form-group">
-                    <label for="appointmentDate">Fecha y Hora:</label>
-                    <input v-model="newAppointment.date" type="datetime-local" id="appointmentDate" class="form-control"
-                        required />
-                </div>
-                <div class="form-group">
-                    <label for="appointmentCenter">Centro:</label>
-                    <select v-model="newAppointment.center" id="appointmentCenter" class="form-control" required>
-                        <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
-                        </option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Reservar Cita</button>
-                <button @click="closeCreateAppointmentModal" class="btn btn-secondary">Cancelar</button>
-            </form>
-        </div>
+    <!-- Modal para crear una nueva cita -->
+    <div v-if="isCreatingAppointment">
+        <h3>Crear Nueva Cita</h3>
+        <form @submit.prevent="createAppointment">
+            <div class="form-group">
+                <label for="appointmentDate">Fecha y Hora:</label>
+                <input v-model="newAppointment.date" type="datetime-local" id="appointmentDate" class="form-control"
+                    required />
+            </div>
 
-        <!-- Modal para editar una cita -->
-        <div v-if="isEditingAppointment" class="modal">
-            <h3>Modificar Cita</h3>
-            <form @submit.prevent="updateAppointment">
-                <div class="form-group">
-                    <label for="editAppointmentDate">Fecha y Hora:</label>
-                    <input v-model="editedAppointment.date" type="datetime-local" id="editAppointmentDate"
-                        class="form-control" required />
-                </div>
-                <div class="form-group">
-                    <label for="editAppointmentCenter">Centro:</label>
-                    <select v-model="editedAppointment.center" id="editAppointmentCenter" class="form-control" required>
-                        <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
-                        </option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                <button @click="closeEditAppointmentModal" class="btn btn-secondary">Cancelar</button>
-            </form>
-        </div>
+            <div class="form-group">
+                <label for="appointmentDate">{{ user.username }}</label>
+            </div>
+            <div class="form-group">
+                <label for="appointmentCenter">Centro:</label>
+                <select v-model="newAppointment.center" id="appointmentCenter" class="form-control" required>
+                    <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
+                    </option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Reservar Cita</button>
+            <button @click="closeCreateAppointmentModal" class="btn btn-secondary">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- Modal para editar una cita -->
+    <div v-if="isEditingAppointment" class="modal2">
+        <h3>Modificar Cita</h3>
+        <form @submit.prevent="updateAppointment">
+            <div class="form-group">
+                <label for="editAppointmentDate">Fecha y Hora:</label>
+                <input v-model="editedAppointment.date" type="datetime-local" id="editAppointmentDate"
+                    class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label for="editAppointmentCenter">Centro:</label>
+                <select v-model="editedAppointment.center" id="editAppointmentCenter" class="form-control" required>
+                    <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
+                    </option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <button @click="closeEditAppointmentModal" class="btn btn-secondary">Cancelar</button>
+        </form>
+    </div>
     </div>
 </template>
 
@@ -204,6 +208,7 @@ export default {
 
         // Crear una nueva cita
         const createAppointment = async () => {
+            console.log('hora: ', newAppointment.value.date.toLocaleString());
             try {
                 const response = await fetch('http://localhost:5000/date/create', {
                     method: 'POST',
@@ -220,6 +225,7 @@ export default {
                 }
 
                 const data = await response.json();
+                console.log('Respuesta del backend:', data);
                 appointments.value.push(data);
                 closeCreateAppointmentModal();
             } catch (error) {
@@ -230,9 +236,21 @@ export default {
 
         // Abrir el modal de creación de citas
         const openCreateAppointmentModal = async () => {
-            await fetchCenters();
-            isCreatingAppointment.value = true;
+            console.log('Abriendo modal de creación de citas');
+            try {
+                console.log('Fetching centers...');
+                await fetchCenters();
+                console.log('Centers fetched successfully:', centers.value);
+                isCreatingAppointment.value = true;
+                console.log('Modal state:', isCreatingAppointment.value);
+                console.log('Auth token:', authStore.token);
+            } catch (error) {
+                console.error('Error al abrir el modal:', error);
+                alert('Error al cargar los centros. Por favor, inténtalo de nuevo.');
+            }
         };
+
+        console.log(appointments.value);
 
         // Cerrar el modal de creación de citas
         const closeCreateAppointmentModal = () => {
@@ -323,6 +341,7 @@ export default {
         onMounted(() => {
             fetchUserData();
             fetchAppointments();
+            console.log('Appointments:', appointments.value);
         });
 
         return {
@@ -372,18 +391,5 @@ li {
 button {
     padding: 5px;
     margin-bottom: 10px;
-}
-
-.modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
 }
 </style>

@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: null, // token de autenticación
+    token: localStorage.getItem("token") || null, // token de autenticación
     user: null, // información del usuario
     isLoading: false, // indica si se está cargando la información del usuario
   }),
@@ -14,6 +14,7 @@ export const useAuthStore = defineStore("auth", {
     },
     setUser(user) {
       this.user = user; // asigna la información al estado
+      localStorage.setItem("user", JSON.stringify(user)); // guarda la información en el localStorage
     },
     setLoading(isLoading) {
       this.isLoading = isLoading; // asigna el estado de carga

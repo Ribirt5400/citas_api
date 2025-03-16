@@ -58,8 +58,6 @@ npm run dev
 4.  **Accede a la aplicación**:\
     Abre tu navegador y visita `http://localhost:5173`.
 
-## Estructura del Proyecto
-
 ## Endpoints de la API
 
 - **Registro**: `POST /register`

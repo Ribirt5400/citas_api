@@ -64,19 +64,6 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
 4.  **Accede a la aplicación**:\
     Abre tu navegador y visita `http://localhost:8080`.
 
-## Estructura del Proyecto
-
-Copy
-
-src/
-│
-├── assets/ # Archivos estáticos (imágenes, estilos globales)
-├── components/ # Componentes reutilizables
-├── router/ # Configuración de Vue Router
-├── stores/ # Almacenamiento global (Pinia o Vuex)
-├── views/ # Vistas principales (Login, Profile, etc.)
-├── App.vue # Componente principal de la aplicación
-└── main.js # Punto de entrada de la aplicación
 
 ## Endpoints de la API
 

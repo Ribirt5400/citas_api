@@ -39,7 +39,7 @@ Sigue estos pasos para configurar y ejecutar el proyecto en tu máquina local:
 1.  **Clona el repositorio**:
 
 ```sh
-    git clone "link de tu repositorio
+    git clone "link de tu repositorio"
     cd tu-repositorio
 ```
 

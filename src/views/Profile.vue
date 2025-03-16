@@ -46,66 +46,40 @@
             <h2>Mis Citas</h2>
             <button @click="openCreateAppointmentModal">Crear Nueva Cita</button>
             <div v-if="appointments.length">
-            <ul>
-                <li v-for="appointment in appointments" :key="appointment._id">
-                    <p><strong>Fecha:</strong> {{ appointment.date }}</p>
-                    <p><strong>Centro:</strong> {{ appointment.center }}</p>
-                    <p><strong>Estado:</strong> {{ appointment.status }}</p>
-                    <button @click="openEditAppointmentModal(appointment)">Modificar</button>
-                    <button @click="cancelAppointment(appointment._id)">Cancelar</button>
-                </li>
-            </ul>
-        </div>
-        <div v-else>
+                <ul>
+                    <li v-for="appointment in appointments" :key="appointment._id">
+                        <p><strong>Fecha:</strong> {{ appointment.date }}</p>
+                        <p><strong>Centro:</strong> {{ appointment.center }}</p>
+                        <p><strong>Estado:</strong> {{ appointment.status }}</p>
+                        <button @click="cancelAppointment(appointment._id)">Cancelar</button>
+                    </li>
+                </ul>
+            </div>
+            <div v-else>
                 <p>No tiene ninguna cita pedida.</p>
             </div>
-    </div>
+        </div>
 
-    <!-- Modal para crear una nueva cita -->
-    <div v-if="isCreatingAppointment">
-        <h3>Crear Nueva Cita</h3>
-        <form @submit.prevent="createAppointment">
-            <div class="form-group">
-                <label for="appointmentDate">Fecha y Hora:</label>
-                <input v-model="newAppointment.date" type="datetime-local" id="appointmentDate" class="form-control"
-                    required />
-            </div>
-
-            <div class="form-group">
-                <label for="appointmentDate">{{ user.username }}</label>
-            </div>
-            <div class="form-group">
-                <label for="appointmentCenter">Centro:</label>
-                <select v-model="newAppointment.center" id="appointmentCenter" class="form-control" required>
-                    <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
-                    </option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Reservar Cita</button>
-            <button @click="closeCreateAppointmentModal" class="btn btn-secondary">Cancelar</button>
-        </form>
-    </div>
-
-    <!-- Modal para editar una cita -->
-    <div v-if="isEditingAppointment" class="modal2">
-        <h3>Modificar Cita</h3>
-        <form @submit.prevent="updateAppointment">
-            <div class="form-group">
-                <label for="editAppointmentDate">Fecha y Hora:</label>
-                <input v-model="editedAppointment.date" type="datetime-local" id="editAppointmentDate"
-                    class="form-control" required />
-            </div>
-            <div class="form-group">
-                <label for="editAppointmentCenter">Centro:</label>
-                <select v-model="editedAppointment.center" id="editAppointmentCenter" class="form-control" required>
-                    <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
-                    </option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-            <button @click="closeEditAppointmentModal" class="btn btn-secondary">Cancelar</button>
-        </form>
-    </div>
+        <!-- Modal para crear una nueva cita -->
+        <div v-if="isCreatingAppointment">
+            <h3>Crear Nueva Cita</h3>
+            <form @submit.prevent="createAppointment">
+                <div class="form-group">
+                    <label for="appointmentDate">Fecha y Hora:</label>
+                    <input v-model="newAppointment.date" type="datetime-local" id="appointmentDate" class="form-control"
+                        required />
+                </div>
+                <div class="form-group">
+                    <label for="appointmentCenter">Centro:</label>
+                    <select v-model="newAppointment.center" id="appointmentCenter" class="form-control" required>
+                        <option v-for="center in centers" :key="center.name" :value="center.name">{{ center.name }}
+                        </option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Reservar Cita</button>
+                <button @click="closeCreateAppointmentModal" class="btn btn-secondary">Cancelar</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -117,18 +91,15 @@ import { useRouter } from 'vue-router';
 export default {
     setup() {
         const router = useRouter();
-        const user = ref(null); // Estado para los datos del usuario
-        const editedUser = ref({}); // Estado para los datos editados del usuario
-        const isEditing = ref(false); // Estado para controlar si se está editando el perfil
-        const appointments = ref([]); // Estado para las citas del usuario
-        const isEditingAppointment = ref(false); // Estado para controlar el modal de edición de citas
-        const editedAppointment = ref({ date: '', center: '' }); // Estado para los datos de la cita editada
-        const isCreatingAppointment = ref(false); // Estado para controlar el modal de creación de citas
-        const newAppointment = ref({ date: '', center: '' }); // Estado para los datos de la nueva cita
-        const centers = ref([]); // Estado para almacenar los centros disponibles
+        const user = ref(null);
+        const editedUser = ref({});
+        const isEditing = ref(false);
+        const appointments = ref([]);
+        const isCreatingAppointment = ref(false);
+        const newAppointment = ref({ date: '', center: '' });
+        const centers = ref([]);
         const authStore = useAuthStore();
 
-        // Obtener los datos del usuario
         const fetchUserData = async () => {
             try {
                 if (!authStore.token) {
@@ -156,7 +127,6 @@ export default {
             }
         };
 
-        // Obtener las citas del usuario
         const fetchAppointments = async () => {
             try {
                 if (!authStore.token) {
@@ -176,14 +146,15 @@ export default {
                 }
 
                 const data = await response.json();
+                // console.log('datos recibidos: ', data);
                 appointments.value = data;
             } catch (error) {
                 console.error('Error fetching appointments:', error);
+                console.error('El error es:', error);
                 alert('Error al cargar las citas. Por favor, inténtalo de nuevo.');
             }
         };
 
-        // Obtener los centros disponibles
         const fetchCenters = async () => {
             try {
                 const response = await fetch('http://localhost:5000/centers', {
@@ -206,9 +177,7 @@ export default {
             }
         };
 
-        // Crear una nueva cita
         const createAppointment = async () => {
-            console.log('hora: ', newAppointment.value.date.toLocaleString());
             try {
                 const response = await fetch('http://localhost:5000/date/create', {
                     method: 'POST',
@@ -225,7 +194,6 @@ export default {
                 }
 
                 const data = await response.json();
-                console.log('Respuesta del backend:', data);
                 appointments.value.push(data);
                 closeCreateAppointmentModal();
             } catch (error) {
@@ -234,52 +202,28 @@ export default {
             }
         };
 
-        // Abrir el modal de creación de citas
         const openCreateAppointmentModal = async () => {
-            console.log('Abriendo modal de creación de citas');
             try {
-                console.log('Fetching centers...');
                 await fetchCenters();
-                console.log('Centers fetched successfully:', centers.value);
                 isCreatingAppointment.value = true;
-                console.log('Modal state:', isCreatingAppointment.value);
-                console.log('Auth token:', authStore.token);
             } catch (error) {
                 console.error('Error al abrir el modal:', error);
                 alert('Error al cargar los centros. Por favor, inténtalo de nuevo.');
             }
         };
 
-        console.log(appointments.value);
-
-        // Cerrar el modal de creación de citas
         const closeCreateAppointmentModal = () => {
             isCreatingAppointment.value = false;
             newAppointment.value = { date: '', center: '' };
         };
 
-        // Abrir el modal de edición de citas
-        const openEditAppointmentModal = (appointment) => {
-            editedAppointment.value = { ...appointment };
-            isEditingAppointment.value = true;
-        };
-
-        // Cerrar el modal de edición de citas
-        const closeEditAppointmentModal = () => {
-            isEditingAppointment.value = false;
-            editedAppointment.value = { date: '', center: '' };
-        };
-
-        // Actualizar una cita
-        const updateAppointment = async () => {
+        const cancelAppointment = async (appointmentId) => {
             try {
-                const response = await fetch(`http://localhost:5000/date/update/${editedAppointment.value._id}`, {
-                    method: 'PUT',
+                const response = await fetch(`http://localhost:5000/date/delete/${appointmentId}`, {
+                    method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${authStore.token}`,
                     },
-                    body: JSON.stringify(editedAppointment.value),
                 });
 
                 if (!response.ok) {
@@ -287,31 +231,23 @@ export default {
                     throw new Error(`Error ${response.status}: ${errorText}`);
                 }
 
-                const data = await response.json();
-                const index = appointments.value.findIndex(a => a._id === data._id);
-                if (index !== -1) {
-                    appointments.value[index] = data;
-                }
-
-                closeEditAppointmentModal();
+                // Eliminar la cita de la lista
+                appointments.value = appointments.value.filter(a => a._id !== appointmentId);
             } catch (error) {
-                console.error('Error updating appointment:', error);
-                alert('Error al actualizar la cita. Por favor, inténtalo de nuevo.');
+                console.error('Error canceling appointment:', error);
+                alert('Error al cancelar la cita. Por favor, inténtalo de nuevo.');
             }
         };
 
-        // Iniciar la edición del perfil
         const startEditing = () => {
             editedUser.value = { ...user.value };
             isEditing.value = true;
         };
 
-        // Cancelar la edición del perfil
         const cancelEditing = () => {
             isEditing.value = false;
         };
 
-        // Guardar los cambios del perfil
         const saveChanges = async () => {
             try {
                 const response = await fetch('http://localhost:5000/profile', {
@@ -337,11 +273,9 @@ export default {
             }
         };
 
-        // Cargar los datos del usuario y las citas al iniciar el componente
         onMounted(() => {
             fetchUserData();
             fetchAppointments();
-            console.log('Appointments:', appointments.value);
         });
 
         return {
@@ -351,8 +285,6 @@ export default {
             appointments,
             isCreatingAppointment,
             newAppointment,
-            isEditingAppointment,
-            editedAppointment,
             centers,
             startEditing,
             cancelEditing,
@@ -360,9 +292,7 @@ export default {
             openCreateAppointmentModal,
             closeCreateAppointmentModal,
             createAppointment,
-            openEditAppointmentModal,
-            closeEditAppointmentModal,
-            updateAppointment,
+            cancelAppointment,
         };
     },
 };
